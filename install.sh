@@ -64,7 +64,14 @@ npm install
 # ---- Configurar ambiente ----
 echo "[7/9] A configurar ambiente..."
 if [ ! -f ".env" ]; then
-  cp .env.example .env
+  if [ -f ".env.example" ]; then
+    cp .env.example .env
+  else
+    cat > .env << EOF
+DATABASE_URL="file:./dev.db"
+JWT_SECRET="$(openssl rand -hex 32)"
+EOF
+  fi
   JWT_SECRET=$(openssl rand -hex 32)
   sed -i "s/JWT_SECRET=.*/JWT_SECRET=$JWT_SECRET/" .env
   echo "  .env criado com JWT_SECRET aleatório."
