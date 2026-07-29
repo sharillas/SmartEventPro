@@ -289,6 +289,22 @@ async function main() {
   });
 
   console.log("  Orçamento criado.");
+
+  // Departments & Positions
+  const depts = ["AUDIO", "ILUMINACAO", "VIDEO", "ESTRUTURAS", "MOBILIARIO", "ADMINISTRACAO", "RECURSOS_HUMANOS", "COMERCIAL", "TRANSPORTES", "SOM"];
+  for (const d of depts) {
+    await prisma.department.upsert({ where: { name: d }, update: {}, create: { name: d } });
+  }
+  const positions = ["TECNICO_SOM", "TECNICO_VIDEO", "TECNICO_ILUMINACAO", "TECNICO_ESTRUTURAS", "MOTORISTA", "GESTOR_PROJETO", "ADMINISTRATIVO", "COMERCIAL", "DIRETOR_TECNICO", "OPERADOR_LOGISTICA"];
+  for (const p of positions) {
+    await prisma.position.upsert({ where: { name: p }, update: {}, create: { name: p } });
+  }
+  console.log("  Departamentos e Funções criados.");
+
+  // Company info
+  await prisma.companyInfo.upsert({ where: { id: "default" }, update: {}, create: { id: "default" } });
+  console.log("  Dados da empresa inicializados.");
+
   console.log("\nSeed concluído com sucesso!");
   console.log("\nCredenciais de acesso:");
   console.log("  Email: admin@rentpro.pt");

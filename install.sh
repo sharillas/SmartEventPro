@@ -23,62 +23,64 @@ fi
 
 # ---- Atualizar sistema ----
 echo ""
-echo "[1/8] A atualizar sistema..."
+echo "[1/9] A atualizar sistema..."
 apt update -y && apt upgrade -y
 
-# ---- Instalar dependências ----
-echo "[2/8] A instalar dependências..."
+# ---- Instalar dependências de sistema ----
+echo "[2/9] A instalar dependências..."
 apt install -y curl git nginx certbot python3-certbot-nginx ufw
 
 # ---- Instalar Node.js ----
-echo "[3/8] A instalar Node.js $NODE_VERSION..."
+echo "[3/9] A instalar Node.js $NODE_VERSION..."
 if ! command -v node &> /dev/null; then
   curl -fsSL https://deb.nodesource.com/setup_${NODE_VERSION}.x | bash -
   apt install -y nodejs
 fi
-echo "Node.js $(node -v) | npm $(npm -v)"
+echo "  Node.js $(node -v) | npm $(npm -v)"
 
 # ---- Instalar PM2 ----
-echo "[4/8] A instalar PM2..."
+echo "[4/9] A instalar PM2..."
 npm install -g pm2
 
-# ---- Criar diretório da app ----
-echo "[5/8] A criar diretório da aplicação..."
-mkdir -p $APP_DIR
+# ---- Clonar repositório ----
+echo "[5/9] A clonar repositório..."
+if [ ! -d "$APP_DIR" ]; then
+  mkdir -p $APP_DIR
+fi
 cd $APP_DIR
 
-# ---- Clonar repositório (se fornecido) ----
 if [ -d ".git" ]; then
   echo "  Repositório já existe, a atualizar..."
   git pull origin main
 else
-  echo "  A clonar repositório..."
   read -p "URL do repositório GitHub: " REPO_URL
   git clone "$REPO_URL" .
 fi
 
 # ---- Instalar dependências npm ----
-echo "[6/8] A instalar dependências npm..."
+echo "[6/9] A instalar dependências npm..."
 npm install
 
 # ---- Configurar ambiente ----
-echo "[7/8] A configurar ambiente..."
+echo "[7/9] A configurar ambiente..."
 if [ ! -f ".env" ]; then
   cp .env.example .env
   JWT_SECRET=$(openssl rand -hex 32)
   sed -i "s/JWT_SECRET=.*/JWT_SECRET=$JWT_SECRET/" .env
-  echo "  Ficheiro .env criado com JWT_SECRET aleatório."
+  echo "  .env criado com JWT_SECRET aleatório."
+else
+  echo "  .env já existe."
 fi
 
 # ---- Base de dados ----
-echo "[8/8] A configurar base de dados..."
+echo "[8/9] A configurar base de dados..."
 npx prisma generate
 npx prisma migrate deploy
-npx tsx prisma/seed.ts 2>/dev/null || echo "  Seed já aplicado ou base de dados já populada."
+echo "  A Popular base de dados..."
+npx tsx prisma/seed.ts || echo "  Seed já aplicado (OK)."
 
-# ---- Build da aplicação ----
-echo ""
-echo "A compilar aplicação..."
+# ---- Build ----
+echo "[9/9] A compilar aplicação..."
 npm run build
 
 # ---- PM2 ----
@@ -116,7 +118,7 @@ ln -sf /etc/nginx/sites-available/smartevent /etc/nginx/sites-enabled/
 rm -f /etc/nginx/sites-enabled/default
 nginx -t && systemctl reload nginx
 
-# ---- SSL com Certbot ----
+# ---- SSL ----
 echo ""
 read -p "Configurar HTTPS com Let's Encrypt? (s/N): " SSL
 if [ "$SSL" = "s" ] || [ "$SSL" = "S" ]; then
@@ -136,13 +138,15 @@ echo "========================================"
 echo " INSTALAÇÃO CONCLUÍDA!"
 echo "========================================"
 echo ""
-echo "  Aplicação: http://${DOMAIN}"
-echo "  Admin:      admin@rentpro.pt"
-echo "  Senha:      admin123"
+echo "  App:     http://${DOMAIN}"
+echo "  Admin:   admin@rentpro.pt"
+echo "  Senha:   admin123"
 echo ""
 echo "  Comandos úteis:"
-echo "    pm2 status          - Ver estado"
-echo "    pm2 logs smartevent - Ver logs"
-echo "    pm2 restart smartevent - Reiniciar"
-echo "    cd $APP_DIR && git pull && npm install && npm run build && pm2 restart smartevent - Atualizar"
+echo "    pm2 status              - Ver estado"
+echo "    pm2 logs smartevent     - Ver logs"
+echo "    pm2 restart smartevent  - Reiniciar"
+echo ""
+echo "  Atualizar app:"
+echo "    cd $APP_DIR && git pull && npm install && npm run build && pm2 restart smartevent"
 echo ""
