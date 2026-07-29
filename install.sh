@@ -53,8 +53,8 @@ if [ -d ".git" ]; then
   echo "  Repositório já existe, a atualizar..."
   git pull origin main
 else
-  read -p "URL do repositório GitHub: " REPO_URL
-  git clone "$REPO_URL" .
+  echo "  A clonar SmartEventPro..."
+  git clone https://github.com/sharillas/SmartEventPro.git .
 fi
 
 # ---- Instalar dependências npm ----
