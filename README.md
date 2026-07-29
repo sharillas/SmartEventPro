@@ -18,8 +18,8 @@ npm run dev
 ```
 
 Aceder: http://localhost:3000
-- Email: admin@rentpro.pt
-- Senha: admin123
+- Email: admin@admin.pt
+- Senha: 114494
 
 ## Instalação VPS (Debian/Ubuntu)
 

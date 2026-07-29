@@ -10,13 +10,13 @@ async function main() {
   console.log("A criar dados de exemplo...");
 
   // Admin user
-  const hashedPassword = await bcrypt.hash("admin123", 12);
+  const hashedPassword = await bcrypt.hash("114494", 12);
   const admin = await prisma.user.upsert({
-    where: { email: "admin@rentpro.pt" },
-    update: {},
+    where: { email: "admin@admin.pt" },
+    update: { password: hashedPassword },
     create: {
       name: "Administrador",
-      email: "admin@rentpro.pt",
+      email: "admin@admin.pt",
       password: hashedPassword,
       role: "ADMIN",
     },
@@ -307,8 +307,8 @@ async function main() {
 
   console.log("\nSeed concluído com sucesso!");
   console.log("\nCredenciais de acesso:");
-  console.log("  Email: admin@rentpro.pt");
-  console.log("  Senha: admin123");
+  console.log("  Email: admin@admin.pt");
+  console.log("  Senha: 114494");
 }
 
 main()
