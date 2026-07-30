@@ -615,8 +615,7 @@ DEFINIÇÕES:
                          FIM DA DOCUMENTAÇÃO
 ================================================================================
 
-Documento gerado em: Julho 2026
 Documento atualizado em: Julho 2026
-Versão do projeto: 0.2.0
+Versão do projeto: 0.3.0
 Framework: Next.js 16.2.12
 Última atualização do schema: Prisma 7.9.1
