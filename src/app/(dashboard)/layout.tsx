@@ -27,12 +27,15 @@ import {
   ClipboardList,
   Shield,
   Award,
+  Clock,
+  Calendar,
 } from "lucide-react";
 import { toast } from "sonner";
 
 interface MenuGroup {
   label: string;
   icon: React.ComponentType<{ className?: string }>;
+  requiredRole?: string;
   children: { label: string; href: string; icon: React.ComponentType<{ className?: string }> }[];
 }
 
@@ -40,26 +43,34 @@ const menuGroups: MenuGroup[] = [
   {
     label: "Logística",
     icon: Package,
+    requiredRole: "LOGISTICA",
     children: [
       { label: "Equipamentos", href: "/equipamentos", icon: Package },
+      { label: "Categorias", href: "/categorias", icon: ClipboardList },
+      { label: "Stock / Movimentos", href: "/stock/movimentos", icon: Truck },
       { label: "Reparações", href: "/reparacoes", icon: Wrench },
       { label: "Guias de Transporte", href: "/transportes", icon: Truck },
       { label: "Veículos", href: "/veiculos", icon: Car },
       { label: "Notas de Encomenda", href: "/notas-encomenda", icon: FileText },
+      { label: "Colaboradores (Logística)", href: "/colaboradores-logistica", icon: UserCircle },
     ],
   },
   {
     label: "Comercial",
     icon: Briefcase,
+    requiredRole: "COMERCIAL",
     children: [
       { label: "Orçamentos", href: "/orcamentos", icon: FileText },
+      { label: "Eventos", href: "/projetos", icon: Calendar },
       { label: "Clientes / Entidades", href: "/clientes", icon: Building2 },
+      { label: "Serviços", href: "/servicos", icon: Briefcase },
       { label: "Faturação", href: "/faturas", icon: Receipt },
     ],
   },
   {
     label: "Recursos Humanos",
     icon: Users,
+    requiredRole: "RH",
     children: [
       { label: "Colaboradores", href: "/rh", icon: UserCircle },
       { label: "Contratos", href: "/contratos", icon: FileText },
@@ -73,8 +84,18 @@ const menuGroups: MenuGroup[] = [
   {
     label: "Financeiro",
     icon: Receipt,
+    requiredRole: "FINANCEIRO",
     children: [
       { label: "Faturas", href: "/financeiro/faturas", icon: Receipt },
+    ],
+  },
+  {
+    label: "Portal do Técnico",
+    icon: Clock,
+    requiredRole: "TECNICO",
+    children: [
+      { label: "Folha de Horas", href: "/timesheets", icon: Clock },
+      { label: "Ausências", href: "/ausencias", icon: Calendar },
     ],
   },
 ];
@@ -82,7 +103,7 @@ const menuGroups: MenuGroup[] = [
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const [user, setUser] = useState<{ name: string; email: string } | null>(null);
+  const [user, setUser] = useState<{ name: string; email: string; role: string } | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [expandedGroups, setExpandedGroups] = useState<string[]>([]);
 
@@ -123,6 +144,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     );
   }
 
+  const isAdmin = user.role === "ADMIN";
+  const visibleGroups = isAdmin
+    ? menuGroups
+    : menuGroups.filter((g) => !g.requiredRole || g.requiredRole === user.role);
+
   return (
     <div className="min-h-screen bg-background">
       {/* Mobile header */}
@@ -152,6 +178,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               user={user}
               pathname={pathname}
               expandedGroups={expandedGroups}
+              visibleGroups={visibleGroups}
+              isAdmin={isAdmin}
               onToggleGroup={toggleGroup}
               onClose={() => setSidebarOpen(false)}
               onLogout={handleLogout}
@@ -166,6 +194,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           user={user}
           pathname={pathname}
           expandedGroups={expandedGroups}
+          visibleGroups={visibleGroups}
+          isAdmin={isAdmin}
           onToggleGroup={toggleGroup}
           onLogout={handleLogout}
         />
@@ -183,13 +213,17 @@ function SidebarContent({
   user,
   pathname,
   expandedGroups,
+  visibleGroups,
+  isAdmin,
   onToggleGroup,
   onClose,
   onLogout,
 }: {
-  user: { name: string; email: string };
+  user: { name: string; email: string; role: string };
   pathname: string;
   expandedGroups: string[];
+  visibleGroups: MenuGroup[];
+  isAdmin: boolean;
   onToggleGroup: (label: string) => void;
   onClose?: () => void;
   onLogout: () => void;
@@ -234,7 +268,7 @@ function SidebarContent({
 
         {/* Menu Groups */}
         <nav className="space-y-1">
-          {menuGroups.map((group) => (
+          {visibleGroups.map((group) => (
             <div key={group.label}>
               <button
                 onClick={() => onToggleGroup(group.label)}

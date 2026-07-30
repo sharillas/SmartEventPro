@@ -18,18 +18,16 @@ import {
 import { ArrowLeft, User, MapPin, Calendar, FileText } from "lucide-react";
 
 const statusBadge: Record<string, string> = {
-  RASCUNHO: "border-gray-500 text-gray-400",
-  ENVIADO: "border-blue-500 text-blue-400",
-  ACEITE: "border-green-500 text-green-400",
-  RECUSADO: "border-red-500 text-red-400",
-  EXPIRADO: "border-yellow-500 text-yellow-400",
+  DRAFT: "border-gray-500 text-gray-400",
+  ORCAMENTADO: "border-blue-500 text-blue-400",
+  CONFIRMADO: "border-green-500 text-green-400",
+  CANCELADO: "border-red-500 text-red-400",
 };
 const statusLabel: Record<string, string> = {
-  RASCUNHO: "Rascunho",
-  ENVIADO: "Enviado",
-  ACEITE: "Aceite",
-  RECUSADO: "Recusado",
-  EXPIRADO: "Expirado",
+  DRAFT: "Draft",
+  ORCAMENTADO: "Orçamentado",
+  CONFIRMADO: "Confirmado",
+  CANCELADO: "Cancelado",
 };
 
 function formatCurrency(value: number): string {

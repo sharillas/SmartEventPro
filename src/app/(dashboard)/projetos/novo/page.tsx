@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -52,6 +52,8 @@ export default function NovoProjetoPage() {
       .catch(() => {});
   }, []);
 
+  const clientItems = useMemo(() => Object.fromEntries(clients.map((c) => [c.id, c.name] as const)), [clients]);
+
   function handleChange(field: string, value: string) {
     setForm((prev) => ({ ...prev, [field]: value }));
   }
@@ -74,10 +76,10 @@ export default function NovoProjetoPage() {
         }),
       });
       if (!res.ok) throw new Error("Failed to create");
-      toast.success("Projeto criado com sucesso.");
+      toast.success("Evento criado com sucesso.");
       router.push("/projetos");
     } catch {
-      toast.error("Erro ao criar projeto.");
+      toast.error("Erro ao criar evento.");
     } finally {
       setSubmitting(false);
     }
@@ -92,7 +94,7 @@ export default function NovoProjetoPage() {
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbLink href="/projetos">Projetos</BreadcrumbLink>
+            <BreadcrumbLink href="/projetos">Eventos</BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
@@ -104,7 +106,7 @@ export default function NovoProjetoPage() {
         <Button variant="ghost" size="icon" onClick={() => router.back()}>
           <ArrowLeft className="h-5 w-5" />
         </Button>
-        <h1 className="text-2xl font-bold tracking-tight">Novo Projeto</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Novo Evento</h1>
       </div>
 
       <Card>
@@ -125,6 +127,7 @@ export default function NovoProjetoPage() {
                 <Select
                   value={form.clientId}
                   onValueChange={(v) => v && handleChange("clientId", v)}
+                  items={clientItems}
                 >
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Selecionar cliente" />

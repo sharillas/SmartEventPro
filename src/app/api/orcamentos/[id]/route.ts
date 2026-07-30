@@ -40,10 +40,65 @@ export async function PATCH(
     const quotation = await prisma.quotation.update({
       where: { number: id },
       data: data as never,
+      include: { client: true },
     });
 
+    if (body.status === "CONFIRMADO" && !quotation.projectId) {
+      const year = new Date().getFullYear();
+
+      const projectCount = await prisma.project.count({
+        where: { number: { startsWith: "PROJ_" } },
+      });
+      const projectNumber = `PROJ_${String(projectCount + 1).padStart(4, "0")}-${year}`;
+
+      const project = await prisma.project.create({
+        data: {
+          name: quotation.client?.name ? `Evento ${quotation.client.name}` : "Evento",
+          number: projectNumber,
+          clientId: quotation.clientId,
+          location: quotation.location || "",
+          startDate: quotation.startDate || new Date(),
+          endDate: quotation.endDate || new Date(),
+          status: "CONFIRMADO",
+        },
+      });
+
+      await prisma.quotation.update({
+        where: { number: id },
+        data: { projectId: project.id } as never,
+      });
+
+      const invoiceCount = await prisma.invoice.count({
+        where: { number: { startsWith: "FT_" } },
+      });
+      const invoiceNumber = `FT_${String(invoiceCount + 1).padStart(4, "0")}-${year}`;
+
+      await prisma.invoice.create({
+        data: {
+          number: invoiceNumber,
+          quotationId: quotation.id,
+          clientId: quotation.clientId,
+          projectId: project.id,
+          date: new Date(),
+          dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+          subtotal: quotation.subtotal,
+          taxRate: quotation.taxRate,
+          taxAmount: quotation.taxAmount,
+          total: quotation.total,
+          status: "PENDENTE",
+        },
+      });
+
+      return NextResponse.json({
+        ...quotation,
+        projectId: project.id,
+        message: "Evento e fatura criados automaticamente.",
+      });
+    }
+
     return NextResponse.json(quotation);
-  } catch {
+  } catch (error) {
+    console.error("PATCH orcamento error:", error);
     return NextResponse.json({ error: "Erro ao atualizar orçamento" }, { status: 500 });
   }
 }

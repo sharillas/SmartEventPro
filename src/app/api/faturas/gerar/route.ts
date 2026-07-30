@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
     if (!quotation) {
       return NextResponse.json({ error: "Orçamento não encontrado" }, { status: 404 });
     }
-    if (quotation.status !== "ACEITE" && quotation.status !== "ENVIADO") {
+    if (quotation.status !== "CONFIRMADO" && quotation.status !== "ORCAMENTADO") {
       return NextResponse.json({ error: "Orçamento não está aceite ou enviado" }, { status: 400 });
     }
 

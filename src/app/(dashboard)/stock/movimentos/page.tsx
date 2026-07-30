@@ -114,11 +114,13 @@ export default function MovimentosStockPage() {
   }
 
   useEffect(() => {
-    fetch("/api/equipamentos")
-      .then((r) => r.ok ? r.json() : [])
-      .then(setEquipment)
+    fetch("/api/equipamentos?limit=1000")
+      .then((r) => (r.ok ? r.json() : { data: [] }))
+      .then((result) => setEquipment(result.data || result))
       .catch(() => {});
   }, []);
+
+  const equipmentItems = useMemo(() => Object.fromEntries(equipment.map((e) => [e.id, e.name] as const)), [equipment]);
 
   async function handleDelete() {
     if (!deleteId) return;
@@ -313,6 +315,7 @@ export default function MovimentosStockPage() {
               <Select
                 value={form.equipmentId}
                 onValueChange={(v) => v && setForm((p) => ({ ...p, equipmentId: v }))}
+                items={equipmentItems}
               >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Selecionar equipamento" />

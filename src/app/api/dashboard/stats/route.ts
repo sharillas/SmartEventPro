@@ -7,39 +7,39 @@ export async function GET() {
   if (!session) return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
 
   const [
-    totalEquipment,
     equipmentAvailable,
-    equipmentRented,
-    equipmentInRepair,
     activeProjects,
-    pendingQuotations,
-    pendingRepairs,
-    overdueInvoices,
-    totalEmployees,
-    pendingTransports,
+    equipmentInRepair,
+    expiringEPIs,
+    vehiclesInRepair,
+    activeTechnicians,
   ] = await Promise.all([
-    prisma.equipment.count({ where: { active: true } }),
     prisma.equipment.count({ where: { status: "DISPONIVEL", active: true } }),
-    prisma.equipment.count({ where: { status: "ALUGADO", active: true } }),
-    prisma.equipment.count({ where: { status: "EM_REPARACAO", active: true } }),
     prisma.project.count({ where: { status: { in: ["CONFIRMADO", "EM_CURSO"] } } }),
-    prisma.quotation.count({ where: { status: "RASCUNHO" } }),
-    prisma.repairGuide.count({ where: { status: { in: ["PENDENTE", "EM_REPARACAO"] } } }),
-    prisma.invoice.count({ where: { status: "VENCIDO" } }),
-    prisma.employee.count({ where: { active: true } }),
-    prisma.transportGuide.count({ where: { status: { in: ["PENDENTE", "EM_TRANSITO"] } } }),
+    prisma.equipment.count({ where: { status: "EM_REPARACAO", active: true } }),
+    prisma.employeeEPI.count({
+      where: {
+        expiryDate: {
+          lte: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+          gte: new Date(),
+        },
+      },
+    }),
+    prisma.vehicle.count({ where: { status: "EM_MANUTENCAO", active: true } }),
+    prisma.employee.count({
+      where: {
+        active: true,
+        position: { in: ["TECNICO_SOM", "TECNICO_VIDEO", "TECNICO_ILUMINACAO", "TECNICO_ESTRUTURAS"] },
+      },
+    }),
   ]);
 
   return NextResponse.json({
-    totalEquipment,
     equipmentAvailable,
-    equipmentRented,
-    equipmentInRepair,
     activeProjects,
-    pendingQuotations,
-    pendingRepairs,
-    overdueInvoices,
-    totalEmployees,
-    pendingTransports,
+    equipmentInRepair,
+    expiringEPIs,
+    vehiclesInRepair,
+    activeTechnicians,
   });
 }

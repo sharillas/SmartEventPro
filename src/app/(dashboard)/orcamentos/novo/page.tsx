@@ -55,9 +55,9 @@ export default function NovoOrcamentoPage() {
 
   useEffect(() => {
     Promise.all([
-      fetch("/api/equipamentos").then(r => r.json()),
-      fetch("/api/servicos").then(r => r.json()),
-      fetch("/api/clientes").then(r => r.json()),
+      fetch("/api/equipamentos").then(r => r.json()).then(d => d.data || d),
+      fetch("/api/servicos?limit=100").then(r => r.json()).then(d => d.data || d),
+      fetch("/api/clientes?limit=1000").then(r => r.json()).then(d => d.data || d),
     ]).then(([eq, sv, cl]) => {
       setEquipment(eq);
       setServices(sv);
@@ -83,6 +83,8 @@ export default function NovoOrcamentoPage() {
   const filteredServices = useMemo(() => {
     return services.filter(s => s.name.toLowerCase().includes(search.toLowerCase()));
   }, [services, search]);
+
+  const clientItems = useMemo(() => Object.fromEntries(clients.map((c) => [c.id, c.name] as const)), [clients]);
 
   function addItem(type: "EQUIPAMENTO" | "SERVICO", item: any) {
     const existing = items.find(i => i.id === item.id && i.type === type);
@@ -393,7 +395,7 @@ export default function NovoOrcamentoPage() {
                     </Button>
                   </div>
                   {clientMode === "existing" ? (
-                    <Select value={clientId} onValueChange={(v) => v && setClientId(v)}>
+                    <Select value={clientId} onValueChange={(v) => v && setClientId(v)} items={clientItems}>
                       <SelectTrigger className="bg-background border-border text-sm">
                         <SelectValue placeholder="Selecionar cliente..." />
                       </SelectTrigger>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -69,6 +69,8 @@ export default function NovaNotaEncomendaPage() {
       .then((r) => r.json())
       .then(setSuppliers);
   }, []);
+
+  const supplierItems = useMemo(() => Object.fromEntries(suppliers.map((s) => [s.id, s.name] as const)), [suppliers]);
 
   function addItem() {
     setItems([...items, newItem()]);
@@ -167,7 +169,7 @@ export default function NovaNotaEncomendaPage() {
           <CardContent className="p-4 space-y-4">
             <div className="space-y-1.5">
               <Label className="text-xs text-muted-foreground">Fornecedor</Label>
-              <Select value={supplierId} onValueChange={(v) => v && setSupplierId(v)}>
+              <Select value={supplierId} onValueChange={(v) => v && setSupplierId(v)} items={supplierItems}>
                 <SelectTrigger className="bg-background border-border h-8 text-sm">
                   <SelectValue placeholder="Selecionar fornecedor..." />
                 </SelectTrigger>

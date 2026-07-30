@@ -144,10 +144,10 @@ export default function ProjetosPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold tracking-tight">Projetos</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Eventos</h1>
         <Button onClick={() => router.push("/projetos/novo")}>
           <Plus className="mr-1 h-4 w-4" />
-          Novo Projeto
+          Novo Evento
         </Button>
       </div>
 
@@ -158,7 +158,7 @@ export default function ProjetosPage() {
           <input placeholder="Nome" value={filters.name} onChange={e => setFilter("name", e.target.value)} className="w-[150px] h-7 text-xs bg-background border border-border rounded px-2 text-foreground placeholder:text-muted-foreground/50 outline-none focus:border-primary/50" />
         </div>
         <div className="flex flex-col gap-0.5">
-          <span className="text-[10px] text-muted-foreground">N.º Projeto</span>
+          <span className="text-[10px] text-muted-foreground">N.º Evento</span>
           <input placeholder="N.º" value={filters.number} onChange={e => setFilter("number", e.target.value)} className="w-[120px] h-7 text-xs bg-background border border-border rounded px-2 text-foreground placeholder:text-muted-foreground/50 outline-none focus:border-primary/50" />
         </div>
         <div className="flex flex-col gap-0.5">

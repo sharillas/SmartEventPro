@@ -34,6 +34,35 @@ function isPublicPath(pathname: string) {
   return false;
 }
 
+const ROLE_API_MAP: Record<string, string[]> = {
+  LOGISTICA: ["/api/equipamentos", "/api/reparacoes", "/api/transportes", "/api/veiculos", "/api/notas-encomenda", "/api/stock/movimentos", "/api/categorias"],
+  COMERCIAL: ["/api/clientes", "/api/orcamentos", "/api/projetos", "/api/servicos"],
+  FINANCEIRO: ["/api/faturas", "/api/notas-encomenda"],
+  RH: ["/api/colaboradores", "/api/departamentos", "/api/funcoes", "/api/epis", "/api/certificacoes", "/api/contratos"],
+  TECNICO: ["/api/timesheets", "/api/absences", "/api/colaboradores", "/api/projetos"],
+};
+
+const PUBLIC_API_PREFIXES = ["/api/auth", "/api/dashboard", "/api/company-info", "/api/upload"];
+
+function canAccessApi(role: string, pathname: string) {
+  if (role === "ADMIN") return true;
+  if (PUBLIC_API_PREFIXES.some((p) => pathname.startsWith(p))) return true;
+  const allowedPaths = ROLE_API_MAP[role] || [];
+  return allowedPaths.some((prefix) => pathname.startsWith(prefix));
+}
+
+function canAccessPage(role: string, pathname: string) {
+  if (pathname === "/") return true;
+  if (role === "ADMIN") return true;
+  if (role === "TECNICO") return pathname === "/" || pathname.startsWith("/api/");
+  const group = Object.entries(ROLE_API_MAP).find(([r]) => r === role);
+  if (!group) return false;
+  return group[1].some((prefix) => {
+    const pagePath = prefix.replace("/api/", "/");
+    return pathname === pagePath || pathname.startsWith(pagePath + "/") || pathname.startsWith(prefix);
+  });
+}
+
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
@@ -49,6 +78,14 @@ export async function proxy(request: NextRequest) {
     }
     const loginUrl = new URL("/login", request.url);
     return NextResponse.redirect(loginUrl);
+  }
+
+  if (pathname.startsWith("/api/") && !canAccessApi(session.role, pathname)) {
+    return NextResponse.json({ error: "Acesso negado" }, { status: 403 });
+  }
+
+  if (!pathname.startsWith("/api/") && pathname !== "/" && !canAccessPage(session.role, pathname)) {
+    return NextResponse.redirect(new URL("/", request.url));
   }
 
   return NextResponse.next();

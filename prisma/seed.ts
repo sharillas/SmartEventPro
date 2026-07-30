@@ -23,6 +23,23 @@ async function main() {
   });
   console.log("  Utilizador admin criado:", admin.email);
 
+  // Role users
+  const roles = [
+    { name: "Comercial", email: "comercial@rentpro.pt", role: "COMERCIAL" },
+    { name: "Logística", email: "logistica@rentpro.pt", role: "LOGISTICA" },
+    { name: "Financeiro", email: "financeiro@rentpro.pt", role: "FINANCEIRO" },
+    { name: "RH", email: "rh@rentpro.pt", role: "RH" },
+    { name: "Técnico", email: "tecnico@rentpro.pt", role: "TECNICO" },
+  ];
+  for (const r of roles) {
+    await prisma.user.upsert({
+      where: { email: r.email },
+      update: { password: hashedPassword, role: r.role },
+      create: { name: r.name, email: r.email, password: hashedPassword, role: r.role },
+    });
+  }
+  console.log("  Utilizadores por role criados.");
+
   // Warehouse
   const warehouse = await prisma.warehouse.upsert({
     where: { id: "warehouse-main" },

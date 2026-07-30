@@ -14,7 +14,7 @@ model User {
   name         String
   email        String   @unique
   password     String
-  role         String   @default("TECNICO") // ADMIN, GESTOR, TECNICO, CONSULTA
+  role         String   @default("TECNICO") // ADMIN, COMERCIAL, LOGISTICA, FINANCEIRO, RH, TECNICO, CONSULTA
   avatar       String?
   active       Boolean  @default(true)
   createdAt    DateTime @default(now())
@@ -50,6 +50,8 @@ model Employee {
   contracts       EmployeeContract[]
   projects        ProjectEmployee[]
   transportGuides TransportGuide[]
+  timesheets      TimeSheet[]
+  absences        Absence[]
 }
 
 model EmployeeEPI {
@@ -260,6 +262,7 @@ model Project {
   invoices         Invoice[]
   stockMovements   StockMovement[]
   transportGuides  TransportGuide[]
+  timesheets       TimeSheet[]
 }
 
 model ProjectEquipment {
@@ -505,4 +508,37 @@ model CompanyInfo {
   email   String @default("geral@smartchoice.pt")
   nif     String @default("506219240")
   website String @default("smartchoice.pt")
+}
+
+// ==================== PORTAL DO TÉCNICO ====================
+
+model TimeSheet {
+  id         String   @id @default(cuid())
+  employeeId String
+  date       DateTime
+  startTime  String   // HH:mm
+  endTime    String   // HH:mm
+  projectId  String?
+  hours      Float    @default(0)
+  notes      String?
+  status     String   @default("PENDENTE") // PENDENTE, APROVADO, REJEITADO
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  project  Project? @relation(fields: [projectId], references: [id])
+}
+
+model Absence {
+  id         String   @id @default(cuid())
+  employeeId String
+  type       String   // FERIAS, FALTA_JUSTIFICADA, FALTA_INJUSTIFICADA, BAIXA, FOLGA
+  startDate  DateTime
+  endDate    DateTime
+  notes      String?
+  status     String   @default("PENDENTE") // PENDENTE, APROVADO, REJEITADO
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
 }

@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Plus, X, Pencil, Trash2 } from "lucide-react";
@@ -12,18 +12,16 @@ import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { Pagination } from "@/components/ui/pagination";
 
 const statusBadge: Record<string, string> = {
-  RASCUNHO: "border-gray-500 text-gray-400",
-  ENVIADO: "border-blue-500 text-blue-400",
-  ACEITE: "border-green-500 text-green-400",
-  RECUSADO: "border-red-500 text-red-400",
-  EXPIRADO: "border-yellow-500 text-yellow-400",
+  DRAFT: "border-gray-500 text-gray-400",
+  ORCAMENTADO: "border-blue-500 text-blue-400",
+  CONFIRMADO: "border-green-500 text-green-400",
+  CANCELADO: "border-red-500 text-red-400",
 };
 const statusLabel: Record<string, string> = {
-  RASCUNHO: "Rascunho",
-  ENVIADO: "Enviado",
-  ACEITE: "Aceite",
-  RECUSADO: "Recusado",
-  EXPIRADO: "Expirado",
+  DRAFT: "Draft",
+  ORCAMENTADO: "Orçamentado",
+  CONFIRMADO: "Confirmado",
+  CANCELADO: "Cancelado",
 };
 
 function formatCurrency(value: number): string {
@@ -46,6 +44,7 @@ export default function OrcamentosPage() {
   const [deleting, setDeleting] = useState(false);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [refreshKey, setRefreshKey] = useState(0);
   useEffect(() => {
     const params = new URLSearchParams();
     params.set("page", String(page));
@@ -54,7 +53,7 @@ export default function OrcamentosPage() {
       .then(r => r.json())
       .then((result) => { setQuotations(result.data); setTotalPages(result.totalPages); })
       .finally(() => setLoading(false));
-  }, [page]);
+  }, [page, refreshKey]);
 
   async function handleDelete() {
     if (!deleteId) return;
@@ -133,7 +132,18 @@ export default function OrcamentosPage() {
         </div>
         <div className="flex flex-col gap-0.5">
           <span className="text-[10px] text-muted-foreground">Estado</span>
-          <input placeholder="Estado" value={filters.status} onChange={e => setFilter("status", e.target.value)} className="w-[100px] h-7 text-xs bg-background border border-border rounded px-2 text-foreground placeholder:text-muted-foreground/50 outline-none focus:border-primary/50" />
+          <Select value={filters.status} onValueChange={(v) => setFilter("status", !v || v === "all" ? "" : v)}>
+            <SelectTrigger className="w-[130px] h-7 text-xs">
+              <SelectValue placeholder="Todos" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos</SelectItem>
+              <SelectItem value="DRAFT">Draft</SelectItem>
+              <SelectItem value="ORCAMENTADO">Orçamentado</SelectItem>
+              <SelectItem value="CONFIRMADO">Confirmado</SelectItem>
+              <SelectItem value="CANCELADO">Cancelado</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
         {hasAnyFilter && (
           <button onClick={clearFilters} className="h-7 px-3 text-xs text-muted-foreground hover:text-foreground border border-border rounded hover:bg-accent/50 transition-colors mb-0.5">
@@ -174,8 +184,26 @@ export default function OrcamentosPage() {
                         <TableCell className="text-muted-foreground text-sm p-1.5 whitespace-nowrap">{q.location || "—"}</TableCell>
                         <TableCell className="text-foreground text-sm p-1.5 whitespace-nowrap">{formatDate(q.startDate)}</TableCell>
                         <TableCell className="text-foreground text-sm p-1.5 whitespace-nowrap">{formatDate(q.endDate)}</TableCell>
-                        <TableCell className="p-1.5 whitespace-nowrap">
-                          <Badge variant="outline" className={`bg-transparent border text-xs px-1 py-0 ${statusBadge[q.status] || "border-gray-500 text-gray-400"}`}>{statusLabel[q.status] || q.status}</Badge>
+                        <TableCell className="p-1.5 whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
+                          <Select value={q.status} onValueChange={async (v) => {
+                            if (!v) return;
+                            await fetch(`/api/orcamentos/${q.number}`, {
+                              method: "PATCH",
+                              headers: { "Content-Type": "application/json" },
+                              body: JSON.stringify({ status: v }),
+                            });
+                            setRefreshKey(k => k + 1);
+                          }}>
+                            <SelectTrigger className="h-7 w-[120px] text-xs">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="DRAFT">Draft</SelectItem>
+                              <SelectItem value="ORCAMENTADO">Orçamentado</SelectItem>
+                              <SelectItem value="CONFIRMADO">Confirmado</SelectItem>
+                              <SelectItem value="CANCELADO">Cancelado</SelectItem>
+                            </SelectContent>
+                          </Select>
                         </TableCell>
                         <TableCell className="text-right font-semibold text-primary text-sm p-1.5 whitespace-nowrap">{formatCurrency(q.total)}</TableCell>
                         <TableCell className="p-1.5 whitespace-nowrap" onClick={(e) => e.stopPropagation()}>

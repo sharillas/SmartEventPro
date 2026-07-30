@@ -39,6 +39,8 @@ export default function FinanceiroFaturasPage() {
   interface Filters { number: string; client: string; status: string; }
   const initialFilters: Filters = { number: "", client: "", status: "" };
   const [filters, setFilters] = useState<Filters>(initialFilters);
+  const [role, setRole] = useState<string>("");
+  const canEdit = role === "ADMIN" || role === "FINANCEIRO";
   function setFilter(key: keyof Filters, value: string) { setFilters(prev => ({ ...prev, [key]: value })); }
   function clearFilters() { setFilters(initialFilters); }
   const hasAnyFilter = Object.values(filters).some(v => v !== "");
@@ -60,6 +62,7 @@ export default function FinanceiroFaturasPage() {
   const displayed = [...matched, ...rest];
 
   useEffect(() => { fetchData(); }, [page]);
+  useEffect(() => { fetch("/api/auth/me").then(r => r.json()).then(d => { if (d.user) setRole(d.user.role); }); }, []);
 
   async function fetchData() {
     setLoading(true);
@@ -116,7 +119,7 @@ export default function FinanceiroFaturasPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-foreground">Faturas</h1>
+        <h1 className="text-2xl font-bold text-foreground">Faturação</h1>
         <div className="flex gap-2">
           <Button variant="outline" size="sm" className="border-border">
             <FileUp className="h-4 w-4 mr-2" /> Importar PDF
@@ -182,22 +185,16 @@ export default function FinanceiroFaturasPage() {
                         <TableCell className="text-foreground whitespace-nowrap text-sm">{new Intl.NumberFormat("pt-PT", { style: "currency", currency: "EUR" }).format(inv.total)}</TableCell>
                         <TableCell className="whitespace-nowrap text-sm"><Badge className={statusBadge[inv.status] || ""}>{statusLabel[inv.status] || inv.status}</Badge></TableCell>
                         <TableCell className="whitespace-nowrap text-sm">
-                          <Button
-                            variant="ghost"
-                            size="icon-xs"
-                            onClick={() => handleEdit(inv)}
-                            className="h-7 w-7"
-                          >
-                            <Pencil className="h-3 w-3" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon-xs"
-                            onClick={() => setDeleteId(inv.id)}
-                            className="h-7 w-7"
-                          >
-                            <Trash2 className="h-3 w-3 text-destructive" />
-                          </Button>
+                          {canEdit && (
+                            <div className="flex items-center gap-1">
+                              <Button variant="ghost" size="icon-xs" onClick={() => handleEdit(inv)} className="h-8 w-8">
+                                <Pencil className="h-4 w-4" />
+                              </Button>
+                              <Button variant="ghost" size="icon-xs" onClick={() => setDeleteId(inv.id)} className="h-8 w-8">
+                                <Trash2 className="h-4 w-4 text-destructive" />
+                              </Button>
+                            </div>
+                          )}
                         </TableCell>
                       </TableRow>
                     ))}

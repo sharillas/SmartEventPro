@@ -67,8 +67,10 @@ export default function ColaboradoresLogisticaPage() {
   async function fetchData() {
     setLoading(true);
     try {
-      const res = await fetch("/api/colaboradores");
-      setEmployees(await res.json());
+      const res = await fetch("/api/colaboradores?limit=1000");
+      if (!res.ok) throw new Error("Erro");
+      const result = await res.json();
+      setEmployees(result.data || result);
     } catch { toast.error("Erro ao carregar."); }
     setLoading(false);
   }

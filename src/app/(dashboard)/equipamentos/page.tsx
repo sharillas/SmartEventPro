@@ -236,7 +236,7 @@ export default function EquipamentosPage() {
                         </TableCell>
                         <TableCell className="whitespace-nowrap text-sm p-1.5">
                           <div className="flex items-center gap-1">
-                            <Button variant="ghost" size="icon-xs" onClick={() => router.push(`/equipamentos/${item.id}`)} className="h-8 w-8">
+                            <Button variant="ghost" size="icon-xs" onClick={() => router.push(`/equipamentos/novo?edit=${item.id}`)} className="h-8 w-8">
                               <Pencil className="h-4 w-4" />
                             </Button>
                             <Button variant="ghost" size="icon-xs" onClick={() => setDeleteId(item.id)} className="h-8 w-8">
