@@ -1,0 +1,622 @@
+================================================================================
+                    SMARTEVENTMANAGER - DOCUMENTAÇÃO COMPLETA
+================================================================================
+
+================================================================================
+  1. VISÃO GERAL DO PROJETO
+================================================================================
+
+SmartEventManager é um sistema de gestão completo para empresas de aluguer de
+equipamentos de eventos, cobrindo áudio, vídeo, iluminação, estruturas e
+mobiliário.
+
+  - Nome do projeto: SmartEventManager
+  - Repositório: SmartEventPro
+  - Domínio de produção: app.smartvideo.tech
+
+TECH STACK:
+  - Frontend:   Next.js 16 + React 19 + TypeScript 5
+  - UI:         Shadcn/ui + Tailwind CSS 4
+  - Base dados: Prisma ORM 7 + SQLite (libSQL)
+  - Autenticação: JWT (jose 6) + bcryptjs (cookies HTTP-only)
+  - PDFs:       jsPDF 4 + jspdf-autotable 5
+  - Gráficos:   recharts 3
+  - Validação:  zod 4
+  - Datas:      date-fns 4
+  - Toasts:     sonner 2
+  - Ícones:     lucide-react
+  - Font:       Lekton (Google Fonts)
+
+================================================================================
+  2. MÓDULOS IMPLEMENTADOS
+================================================================================
+
+MÓDULO 1: DASHBOARD
+  - Visão geral com estatísticas (total equipamentos, disponíveis, alugados,
+    em reparação, projetos ativos, orçamentos pendentes, reparações pendentes,
+    faturas vencidas, colaboradores ativos, transportes pendentes)
+  - Projetos recentes
+  - Alertas de stock baixo (equipamentos abaixo do minStock)
+  - Eventos próximos (próximos 30 dias)
+
+MÓDULO 2: LOGÍSTICA
+  - Equipamentos: Gestão de inventário com SKU, categorias, preços de aluguer,
+    quantidade, stock mínimo, estado (disponível/alugado/reparação/abatido),
+    atributos customizados (chave/valor), potência/peso/dimensões
+  - Categorias: Hierarquia de categorias (parent/children) para equipamentos
+  - Armazéns: Gestão de múltiplos armazéns
+  - Movimentos de Stock: Entradas, saídas, transferências, avarias, reparações
+    concluídas, com rastreabilidade por armazém, projeto e utilizador
+  - Reparações: Guias de reparação com itens, custos, estado (pendente,
+    em reparação, concluído, devolvido), reparador externo
+  - Guias de Transporte: Gestão de transporte de equipamentos entre origem e
+    destino, associadas a projetos, veículos e motoristas, com itens
+    transportados e estados (pendente, em trânsito, concluído, cancelado)
+  - Veículos: Frota com matrícula, marca, modelo, tipo (ligeiro/pesado/
+    carrinha/camião/empilhador), combustível, capacidade (kg/m³), estado
+    (disponível/em uso/manutenção/abatido), seguro e inspeção
+  - Notas de Encomenda: Encomendas a fornecedores com itens, departamento,
+    código de projeto, imobilizado, estados (pendente/aprovado/encomendado/
+    recebido/cancelado), com PDF
+
+MÓDULO 3: COMERCIAL
+  - Orçamentos: Criação com número automático (PR_), itens (equipamento/serviço/
+    mão-de-obra), cliente, datas, validade, IVA, desconto, estados
+    (rascunho/enviado/aceite/recusado/expirado), PDF de orçamento
+  - Clientes/Fornecedores/Entidades: Ficha única com tipo (CLIENTE/FORNECEDOR/
+    ENTIDADE), dados fiscais, morada, contactos
+  - Faturação: Lista de faturas com geração a partir de orçamento aceite
+
+MÓDULO 4: RECURSOS HUMANOS
+  - Colaboradores: Ficha completa com posição, departamento, taxas horária/diária,
+    datas de início/fim, estado ativo
+  - Departamentos: Gestão de departamentos (Áudio, Vídeo, Iluminação,
+    Estruturas, Mobiliário, Administração, RH, Comercial, Transportes, Som)
+  - Funções: Gestão de posições/funções (Técnico Som, Técnico Vídeo,
+    Técnico Iluminação, Técnico Estruturas, Motorista, Gestor Projeto,
+    Administrativo, Comercial, Diretor Técnico, Operador Logística)
+  - EPIs: Equipamentos de proteção individual atribuídos a colaboradores,
+    com tipo, descrição, número série, data entrega e validade
+  - Certificações: Certificados e formações dos colaboradores com entidade
+    emissora, datas de emissão e validade, URL do documento
+  - Contratos: Tipos de contrato (sem prazo, prazo certo, parcial, prestação
+    serviços, estágio) com datas e salário
+  - Alocação de colaboradores a projetos (ProjectEmployee)
+
+MÓDULO 5: FINANCEIRO
+  - Faturas: Geração automática a partir de orçamento aceite com número FT_,
+    estados (pendente/pago/vencido/cancelado), IVA
+  - PDF de fatura (estrutura de dados implementada)
+
+MÓDULO 6: SERVIÇOS
+  - Catálogo de serviços com categoria (Vídeo, Som, Iluminação, Estruturas,
+    Mobiliário, Transporte, Montagem, Outro), preço padrão, unidade
+    (UN, HORA, DIA, SERVICO, KM)
+  - Alocação de serviços a projetos (ProjectService)
+
+MÓDULO 7: PROJETOS / EVENTOS
+  - Projetos com número automático (PROJ_), cliente, datas, localização,
+    estados (rascunho/orçamentado/confirmado/em curso/concluído/cancelado)
+  - Alocação de equipamentos, serviços e colaboradores ao projeto
+  - Ligação a orçamentos, faturas, movimentos de stock e guias de transporte
+
+MÓDULO 8: DEFINIÇÕES
+  - Dados da empresa (nome, morada, código postal, telefone, email, NIF, website)
+    usados nos cabeçalhos/rodapés de PDFs
+  - Gestão de Utilizadores (admin pode gerir users)
+  - Autenticação: login/logout/registo/me com JWT
+
+================================================================================
+  3. ESQUEMA DA BASE DE DADOS (RESUMO DE MODELOS/TABELAS)
+================================================================================
+
+AUTENTICAÇÃO:
+  - User: id, name, email (unique), password (bcrypt), role (ADMIN/GESTOR/
+    TECNICO/CONSULTA), avatar, active, createdAt, updatedAt
+
+RECURSOS HUMANOS:
+  - Employee: id, name, email, phone, nif, address, position, department,
+    hourlyRate, dailyRate, startDate, endDate, active, notes
+  - EmployeeEPI: id, employeeId (FK), epiType (CAPACETE/LUVAS/BOTAS/ARNES/
+    PROTETOR_AUDITIVO/COLETE/OCULOS/OUTRO), description, serialNumber,
+    deliveredAt, expiryDate, notes
+  - EmployeeCertification: id, employeeId (FK), name, issuingEntity,
+    issueDate, expiryDate, documentUrl, notes
+  - EmployeeContract: id, employeeId (FK), type (SEM_PRAZO/PRAZO_CERTO/
+    PARCIAL/PRESTACAO_SERVICOS/ESTAGIO), startDate, endDate, salary, notes
+
+DEPARTAMENTOS E FUNÇÕES:
+  - Department: id, name (unique), active
+  - Position: id, name (unique), active
+
+CLIENTES:
+  - Client: id, name, type (CLIENTE/FORNECEDOR/ENTIDADE), companyName,
+    email, phone, nif, address, city, postalCode, country, notes, active
+
+INVENTÁRIO / STOCK:
+  - Category: id, name, slug (unique), description, parentId (FK self),
+    active (hierarquia pai/filhos)
+  - Equipment: id, name, sku (unique), description, categoryId (FK), brand,
+    model, serialNumber, purchaseDate, purchasePrice, rentalPriceDaily,
+    rentalPriceWeekly, quantity, minStock, unit (UN/KG/M/M2/L/PAR),
+    status (DISPONIVEL/ALUGADO/EM_REPARACAO/ABATIDO/EXTRAVIADO),
+    powerWatts, weightKg, dimensions, active, notes, imageUrl
+  - EquipmentAttribute: id, equipmentId (FK), key, value (atributos custom)
+  - Warehouse: id, name, location, active
+  - StockMovement: id, equipmentId (FK), type (ENTRADA/SAIDA/TRANSFERENCIA/
+    AVARIA/REPARACAO_CONCLUIDA), quantity, sourceWarehouseId (FK),
+    destinationWarehouseId (FK), projectId (FK), userId (FK), notes
+
+SERVIÇOS:
+  - Service: id, name, description, category (VIDEO/SOM/ILUMINACAO/
+    ESTRUTURAS/MOBILIARIO/TRANSPORTE/MONTAGEM/OUTRO), defaultPrice,
+    unit (UN/HORA/DIA/SERVICO/KM), active
+
+PROJETOS / EVENTOS:
+  - Project: id, name, number (unique, PROJ-AAAA-NNNN), clientId (FK),
+    description, location, startDate, endDate, status (RASCUNHO/ORCAMENTADO/
+    CONFIRMADO/EM_CURSO/CONCLUIDO/CANCELADO), notes
+  - ProjectEquipment: id, projectId (FK), equipmentId (FK), quantity,
+    priceOverride, notes
+  - ProjectService: id, projectId (FK), serviceId (FK), quantity,
+    priceOverride, notes
+  - ProjectEmployee: id, projectId (FK), employeeId (FK), role, hours,
+    rateOverride, notes
+
+ORÇAMENTOS:
+  - Quotation: id, number (unique, PR_NNNN-AAAA), projectId (FK), clientId (FK),
+    location, startDate, endDate, date, validUntil, subtotal, taxRate (default 23),
+    taxAmount, discount, total, status (RASCUNHO/ENVIADO/ACEITE/RECUSADO/
+    EXPIRADO), notes
+  - QuotationItem: id, quotationId (FK), type (EQUIPAMENTO/SERVICO/MAO_OBRA),
+    referenceId, description, quantity, unitPrice, taxRate, total
+
+FATURAS:
+  - Invoice: id, number (unique, FT-NNNN-AAAA), quotationId (FK unique),
+    projectId (FK), clientId (FK), date, dueDate, subtotal, taxRate,
+    taxAmount, total, status (PENDENTE/PAGO/VENCIDO/CANCELADO), notes
+
+REPARAÇÕES:
+  - RepairGuide: id, number (unique), description, status (PENDENTE/
+    EM_REPARACAO/CONCLUIDO/DEVOLVIDO), reportedBy, reportedAt, startDate,
+    endDate, externalRepairer, totalCost, notes
+  - RepairItem: id, repairGuideId (FK), equipmentId (FK), description,
+    issue, solution, cost, status (PENDENTE/EM_REPARACAO/CONCLUIDO)
+
+TRANSPORTES:
+  - Vehicle: id, number (unique optional), name, licensePlate (unique),
+    brand, model, year, type (LIGEIRO/PESADO/CARRINHA/CAMIAO/EMPILHADOR),
+    fuelType (GASOLINA/GASOLEO/ELETRICO/HIBRIDO), capacityKg, capacityM3,
+    status (DISPONIVEL/EM_USO/EM_MANUTENCAO/ABATIDO), insuranceExpiry,
+    inspectionExpiry, notes, active
+  - TransportGuide: id, number (unique), projectId (FK), vehicleId (FK),
+    driverId (FK Employee), departureDate, returnDate, origin, destination,
+    status (PENDENTE/EM_TRANSITO/CONCLUIDO/CANCELADO), notes, createdById (FK User)
+  - TransportItem: id, transportGuideId (FK), equipmentId (FK), description,
+    quantity, notes
+
+NOTAS DE ENCOMENDA:
+  - OrderNote: id, number (unique), supplierId (FK Client), department,
+    projectCode, date, status (PENDENTE/APROVADO/ENCOMENDADO/RECEBIDO/
+    CANCELADO), subtotal, taxAmount, total, fixedAsset (boolean), notes
+  - OrderNoteItem: id, orderNoteId (FK), description, quantity, unitPrice,
+    taxRate, taxAmount, total
+
+DEFINIÇÕES:
+  - CompanyInfo: id ("default"), name, address, postal, phone, email, nif, website
+
+================================================================================
+  4. PROTOCOLO DE NUMERAÇÃO
+================================================================================
+
+Todos os documentos usam um sistema de numeração automática com o formato:
+  PREFIXO_SEQUENCIAL-ANO
+
+  PR_XXXX-AAAA   →  Orçamentos (Propostas)        Ex: PR_0001-2026
+  FT_XXXX-AAAA   →  Faturas                        Ex: FT_0001-2026
+  PROJ_XXXX-AAAA →  Projetos                       Ex: PROJ_0001-2026
+  GUI_XXXX-AAAA  →  Guias de Transporte            Ex: GUI_0001-2026
+  RP_XXXX-AAAA   →  Guias de Reparação             Ex: RP_0001-2026
+  NE_XXXX-AAAA   →  Notas de Encomenda             Ex: NE_0001-2026
+  VC_XXXX-AAAA   →  Veículos (campo number opcional, não auto-gerado)
+
+  XXXX = sequencial de 4 dígitos com zero-padding (0001, 0002, ...)
+  AAAA = ano corrente (ex: 2026)
+
+LÓGICA DE GERAÇÃO (exemplo para orçamentos):
+  - Conta todos os registos cujo número começa com "PR_"
+  - Usa count + 1 como sequencial
+  - Formata: PR_0001-2026 (se for o primeiro do ano)
+
+================================================================================
+  5. ESTRUTURA DE FICHEIROS
+================================================================================
+
+rentpro/
+  prisma/
+    schema.prisma          # Schema da base de dados (SQLite/libSQL)
+    seed.ts                 # Seed inicial (admin, categorias, equipamentos,
+                              clientes, fornecedores, colaboradores, EPIs,
+                              serviços, veículos, projetos, orçamento)
+  src/
+    app/
+      layout.tsx            # Layout raiz (Next.js) - tema dark, fonte Lekton
+      globals.css           # Estilos globais Tailwind + tema
+      (auth)/login/page.tsx # Página de login
+      (dashboard)/
+        layout.tsx          # Layout do dashboard com sidebar (Logística,
+                              Comercial, RH, Financeiro, Definições)
+        page.tsx            # Dashboard principal (estatísticas, gráficos)
+        equipamentos/
+          page.tsx          # Lista de equipamentos
+          novo/page.tsx     # Novo equipamento
+        reparacoes/page.tsx # Guias de reparação
+        transportes/page.tsx# Guias de transporte
+        veiculos/page.tsx   # Veículos (logística)
+        notas-encomenda/
+          page.tsx          # Lista de notas de encomenda
+          novo/page.tsx     # Nova nota de encomenda
+          [id]/page.tsx     # Detalhe/edição de nota de encomenda
+        orcamentos/
+          page.tsx          # Lista de orçamentos
+          novo/page.tsx     # Novo orçamento
+          [id]/page.tsx     # Detalhe/edição de orçamento
+        clientes/page.tsx   # Clientes/Fornecedores/Entidades
+        faturas/page.tsx    # Lista de faturas (atalho comercial)
+        rh/page.tsx         # Colaboradores (RH)
+        departamentos/page.tsx  # Departamentos
+        funcoes/page.tsx    # Funções
+        veiculos-rh/page.tsx    # Veículos (visão RH)
+        colaboradores-logistica/page.tsx  # Colaboradores (visão logística)
+        projetos/
+          page.tsx          # Lista de projetos
+          novo/page.tsx     # Novo projeto
+        servicos/page.tsx   # Serviços
+        stock/movimentos/page.tsx  # Movimentos de stock
+        financeiro/faturas/page.tsx # Faturas (visão financeira)
+        definicoes/page.tsx # Definições da empresa e utilizadores
+      api/
+        auth/login/route.ts     # POST - Login e set de cookie JWT
+        auth/logout/route.ts    # POST - Logout (clear cookie)
+        auth/register/route.ts  # POST - Registo de novo utilizador
+        auth/me/route.ts        # GET  - Dados do user autenticado
+        auth/users/route.ts     # GET/POST - Listar e criar utilizadores (admin)
+        company-info/route.ts   # GET/PUT - Dados da empresa
+        dashboard/stats/route.ts         # GET - Estatísticas dashboard
+        dashboard/recent-projects/route.ts # GET - Projetos recentes
+        dashboard/low-stock/route.ts     # GET - Alertas stock baixo
+        dashboard/upcoming-events/route.ts # GET - Próximos eventos
+        equipamentos/route.ts   # GET/POST - Listar/criar equipamentos
+        categorias/route.ts     # GET/POST - Listar/criar categorias
+        clientes/route.ts       # GET/POST - Listar/criar clientes
+        colaboradores/route.ts  # GET/POST - Listar/criar colaboradores
+        projetos/route.ts       # GET/POST - Listar/criar projetos
+        orcamentos/route.ts     # GET - Listar orçamentos
+        orcamentos/novo/route.ts # POST - Criar orçamento (com itens)
+        orcamentos/[id]/route.ts # GET/PUT/DELETE - Orçamento individual
+        faturas/route.ts        # GET - Listar faturas
+        faturas/gerar/route.ts  # POST - Gerar fatura a partir de orçamento
+        reparacoes/route.ts     # GET/POST - Listar/criar reparações
+        transportes/route.ts    # GET/POST - Listar/criar guias transporte
+        veiculos/route.ts       # GET/POST - Listar/criar veículos
+        notas-encomenda/route.ts    # GET/POST - Listar/criar notas encomenda
+        notas-encomenda/[id]/route.ts # GET/PUT/DELETE - Nota encomenda individual
+        servicos/route.ts       # GET/POST - Listar/criar serviços
+        departamentos/route.ts  # GET/POST - Listar/criar departamentos
+        funcoes/route.ts        # GET/POST - Listar/criar funções
+        epis/route.ts           # GET/POST - Listar/criar EPIs
+        certificacoes/route.ts  # GET/POST - Listar/criar certificações
+        stock/movimentos/route.ts # GET/POST - Listar/criar movimentos stock
+        pdf/orcamento/[id]/route.ts      # GET - Gerar PDF de orçamento
+        pdf/orcamento/preview/route.ts   # GET/POST - Preview PDF orçamento
+        pdf/nota-encomenda/[id]/route.ts # GET - Gerar PDF nota encomenda
+    components/ui/            # Componentes Shadcn/ui (20+)
+      avatar, badge, breadcrumb, button, calendar, card, checkbox,
+      command, dialog, dropdown-menu, input, input-group, label,
+      popover, select, separator, sheet, table, tabs, textarea, toast
+    lib/
+      prisma.ts               # Instância PrismaClient com libSQL
+      auth.ts                 # JWT: createToken, verifyToken, getSession,
+                                setSession (cookie), clearSession, hashPassword,
+                                comparePassword
+      pdf-utils.ts           # createPDF, addFooterToAllPages, drawLogo
+                                Cabeçalho/rodapé com dados Smartchoice
+      helpers.ts             # formatCurrency, formatDate, formatDateTime,
+                                generateNumber, STATUS_COLORS, STATUS_LABELS
+      utils.ts               # Utilitário cn() (clsx + tailwind-merge)
+    generated/prisma/        # Prisma Client gerado
+
+================================================================================
+  6. CREDENCIAIS DE ACESSO
+================================================================================
+
+  Ambiente de Desenvolvimento / Produção (seed inicial):
+    Email: admin@admin.pt
+    Senha: 114494
+    Role:  ADMIN
+
+  Roles disponíveis: ADMIN, GESTOR, TECNICO, CONSULTA
+
+================================================================================
+  7. GITHUB
+================================================================================
+
+  Repositório: https://github.com/sharillas/SmartEventPro
+
+  Branch principal: main
+
+================================================================================
+  8. INSTALAÇÃO EM VPS (DEBIAN/UBUNTU)
+================================================================================
+
+  Instalação do zero (um comando):
+    wget https://raw.githubusercontent.com/sharillas/SmartEventPro/main/install.sh
+    chmod +x install.sh
+    sudo ./install.sh
+
+  O script install.sh executa automaticamente:
+    [1/9] Atualização do sistema (apt update && apt upgrade)
+    [2/9] Instalação de dependências (curl, git, nginx, certbot, ufw)
+    [3/9] Instalação do Node.js 22
+    [4/9] Instalação do PM2 (process manager)
+    [5/9] Clone do repositório para /opt/smartevent
+    [6/9] Instalação de dependências npm
+    [7/9] Configuração do ficheiro .env (JWT_SECRET aleatório)
+    [8/9] Configuração da base de dados (prisma generate, migrate, seed)
+    [9/9] Build da aplicação Next.js
+
+  Configuração adicional automática:
+    - PM2: serviço smartevent a correr em localhost:3000
+    - Nginx: proxy reverso para localhost:3000, client_max_body_size 50M
+    - SSL: Certbot opcional (Let's Encrypt)
+    - Firewall UFW: portas 22, 80, 443 abertas
+
+  Atualização da App na VPS:
+    cd /opt/smartevent
+    git pull
+    npm install
+    npx prisma generate
+    npx prisma migrate deploy
+    npm run build
+    pm2 restart smartevent
+
+================================================================================
+  9. DOMÍNIO
+================================================================================
+
+  Produção: app.smartvideo.tech
+
+  Configurado automaticamente no install.sh como domínio padrão (alterável).
+  O Nginx é configurado com proxy_pass para localhost:3000.
+
+================================================================================
+  10. ROTAS DA API (LISTA COMPLETA)
+================================================================================
+
+AUTENTICAÇÃO:
+  POST   /api/auth/login              Login (email + password) → retorna user + set cookie JWT
+  POST   /api/auth/logout             Terminar sessão (clear cookie)
+  POST   /api/auth/register           Registar novo utilizador
+  GET    /api/auth/me                 Obter dados do utilizador autenticado
+  GET    /api/auth/users              Listar utilizadores (admin)
+  POST   /api/auth/users              Criar utilizador (admin)
+
+DEFINIÇÕES:
+  GET    /api/company-info            Obter dados da empresa
+  PUT    /api/company-info            Atualizar dados da empresa (admin)
+
+DASHBOARD:
+  GET    /api/dashboard/stats         Estatísticas gerais (equipamentos, projetos,
+                                        orçamentos, faturas, reparações, colaboradores)
+  GET    /api/dashboard/recent-projects  Projetos recentes
+  GET    /api/dashboard/low-stock     Equipamentos com stock abaixo do mínimo
+  GET    /api/dashboard/upcoming-events  Eventos nos próximos 30 dias
+
+LOGÍSTICA - EQUIPAMENTOS:
+  GET    /api/equipamentos            Listar equipamentos
+  POST   /api/equipamentos            Criar equipamento
+  GET    /api/categorias              Listar categorias
+  POST   /api/categorias              Criar categoria
+
+LOGÍSTICA - REPARAÇÕES:
+  GET    /api/reparacoes              Listar guias de reparação
+  POST   /api/reparacoes              Criar guia de reparação (RP_)
+
+LOGÍSTICA - TRANSPORTES:
+  GET    /api/transportes             Listar guias de transporte
+  POST   /api/transportes             Criar guia de transporte (GUI_)
+
+LOGÍSTICA - VEÍCULOS:
+  GET    /api/veiculos                Listar veículos
+  POST   /api/veiculos                Criar veículo
+
+LOGÍSTICA - NOTAS DE ENCOMENDA:
+  GET    /api/notas-encomenda         Listar notas de encomenda
+  POST   /api/notas-encomenda         Criar nota de encomenda (NE_)
+  GET    /api/notas-encomenda/[id]    Obter nota de encomenda
+  PUT    /api/notas-encomenda/[id]    Atualizar nota de encomenda
+  DELETE /api/notas-encomenda/[id]    Eliminar nota de encomenda
+
+LOGÍSTICA - STOCK:
+  GET    /api/stock/movimentos        Listar movimentos de stock
+  POST   /api/stock/movimentos        Criar movimento de stock
+
+COMERCIAL:
+  GET    /api/orcamentos              Listar orçamentos
+  POST   /api/orcamentos/novo         Criar orçamento (PR_) com itens
+  GET    /api/orcamentos/[id]         Obter orçamento
+  PUT    /api/orcamentos/[id]         Atualizar orçamento
+  DELETE /api/orcamentos/[id]         Eliminar orçamento
+  GET    /api/clientes                Listar clientes/fornecedores/entidades
+  POST   /api/clientes                Criar cliente/fornecedor/entidade
+
+FINANCEIRO:
+  GET    /api/faturas                 Listar faturas
+  POST   /api/faturas/gerar           Gerar fatura (FT_) a partir de orçamento aceite
+
+RH:
+  GET    /api/colaboradores           Listar colaboradores
+  POST   /api/colaboradores           Criar colaborador
+  GET    /api/departamentos           Listar departamentos
+  POST   /api/departamentos           Criar departamento
+  GET    /api/funcoes                 Listar funções
+  POST   /api/funcoes                 Criar função
+  GET    /api/epis                    Listar EPIs
+  POST   /api/epis                    Criar EPI
+  GET    /api/certificacoes           Listar certificações
+  POST   /api/certificacoes           Criar certificação
+
+SERVIÇOS:
+  GET    /api/servicos                Listar serviços
+  POST   /api/servicos                Criar serviço
+
+PROJETOS:
+  GET    /api/projetos                Listar projetos
+  POST   /api/projetos                Criar projeto (PROJ_)
+
+PDFs:
+  GET    /api/pdf/orcamento/[id]      Gerar PDF de orçamento (por número PR_)
+  GET    /api/pdf/orcamento/preview   Preview do PDF de orçamento
+  GET    /api/pdf/nota-encomenda/[id] Gerar PDF de nota de encomenda (por número NE_)
+
+================================================================================
+  11. PÁGINAS DA APLICAÇÃO (LISTA COMPLETA)
+================================================================================
+
+AUTENTICAÇÃO:
+  /login                                Página de login
+
+DASHBOARD:
+  /                                     Dashboard principal (estatísticas)
+
+LOGÍSTICA:
+  /equipamentos                         Lista de equipamentos
+  /equipamentos/novo                    Criar novo equipamento
+  /reparacoes                           Guias de reparação
+  /transportes                          Guias de transporte
+  /veiculos                             Veículos (visão logística)
+  /notas-encomenda                      Lista de notas de encomenda
+  /notas-encomenda/novo                 Nova nota de encomenda
+  /notas-encomenda/[id]                 Detalhe/edição de nota de encomenda
+  /stock/movimentos                     Movimentos de stock
+
+COMERCIAL:
+  /orcamentos                           Lista de orçamentos
+  /orcamentos/novo                      Novo orçamento
+  /orcamentos/[id]                      Detalhe/edição de orçamento
+  /clientes                             Clientes / Fornecedores / Entidades
+  /faturas                              Faturas (atalho)
+
+RECURSOS HUMANOS:
+  /rh                                   Colaboradores
+  /departamentos                        Departamentos
+  /funcoes                              Funções
+  /veiculos-rh                          Veículos (visão RH)
+  /colaboradores-logistica              Colaboradores (visão logística)
+
+FINANCEIRO:
+  /financeiro/faturas                   Faturas (visão financeira)
+
+SERVIÇOS:
+  /servicos                             Catálogo de serviços
+
+PROJETOS:
+  /projetos                             Lista de projetos
+  /projetos/novo                        Novo projeto
+
+DEFINIÇÕES:
+  /definicoes                           Definições (dados empresa + utilizadores)
+
+================================================================================
+  12. CORREÇÕES/KEY FIXES APLICADAS
+================================================================================
+
+1. COOKIE SECURE=FALSE
+   - O cookie de sessão (rentpro-token) usa secure: false para compatibilidade
+     com ambientes de desenvolvimento HTTP e VPS sem HTTPS.
+   - Configuração em: src/lib/auth.ts:48 (setSession)
+   - Detalhes: httpOnly: true, secure: false, sameSite: "lax", maxAge: 24h
+
+2. URLs AMIGÁVEIS
+   - Todas as rotas usam URLs em português amigáveis:
+     /equipamentos, /orcamentos, /clientes, /faturas, /reparacoes,
+     /transportes, /veiculos, /notas-encomenda, /colaboradores,
+     /departamentos, /funcoes, /servicos, /projetos, /definicoes
+   - Estrutura de rotas Next.js com route groups: (dashboard) e (auth)
+
+3. PDFs COM CABEÇALHO/RODAPÉ
+   - Orçamentos: PDF gerado com jsPDF + jspdf-autotable
+     - Cabeçalho: logo "S" circular + dados Smartchoice Audiovisuais Lda.
+     - Tabela de itens com cabeçalho estilizado (azul escuro)
+     - Totais (subtotal, IVA, total) com destaque a azul
+     - Rodapé: "Smartchoice@2026", direitos reservados,
+       número de página, data atual
+   - Notas de Encomenda: PDF com mesma formatação
+   - Função createPDF em src/lib/pdf-utils.ts
+
+4. TEMA DARK
+   - Aplicação usa tema escuro (class="dark" no <html>)
+   - Sidebar e componentes estilizados para dark mode
+   - Toast notifications com richColors
+
+5. AUTENTICAÇÃO JWT SEGURA
+   - Tokens JWT com algoritmo HS256
+   - Expiração de 24 horas
+   - Cookies HTTP-only para proteção contra XSS
+   - JWT_SECRET gerado aleatoriamente na instalação VPS (openssl rand -hex 32)
+
+6. BASE DE DADOS SQLite VIA LIBSQL
+   - SQLite com adapter libSQL para melhor performance
+   - Conexão via ficheiro local: file:./dev.db
+   - Configurado em: src/lib/prisma.ts
+
+7. INSTALADOR VPS COMPLETO
+   - Script bash totalmente automatizado (install.sh)
+   - Domínio configurável interativamente
+   - Suporte a SSL via Certbot/Let's Encrypt (opcional)
+   - Configuração automática de firewall (UFW)
+   - PM2 com auto-start no boot (systemd)
+
+8. SIDEBAR DINÂMICA COM GRUPOS EXPANSÍVEIS
+   - Menu lateral com 4 grupos: Logística, Comercial, RH, Financeiro
+   - Estado de expansão persistido em sessionStorage
+   - Suporte mobile com sidebar overlay
+
+================================================================================
+  13. DADOS DA EMPRESA NO CABEÇALHO DOS PDFs
+================================================================================
+
+  Os PDFs de orçamentos e notas de encomenda incluem no cabeçalho:
+
+  Empresa:   Smartchoice Audiovisuais Lda.
+  Morada:    Rua Francisco Simões Carneiro Nº 4
+  Cód. Postal: 2700-402 Venda Nova, Amadora
+  Telefone:  +351 218 688 035
+  Email:     geral@smartchoice.pt
+  NIF:       506219240
+
+  O cabeçalho tem altura fixa (37mm) e inclui:
+    - Logótipo circular com a letra "S" à esquerda
+    - Nome da empresa a negrito
+    - Dados de contacto em texto pequeno
+    - Título do documento (Orçamento / Nota de Encomenda) alinhado à direita
+    - Linha separadora horizontal
+
+  O rodapé inclui:
+    - "Smartchoice@2026" à esquerda
+    - "all rights reserved smartchoice.pt@2026" ao centro
+    - Paginação (Pág. X/Y) + data atual formatada à direita
+
+  Os dados da empresa podem ser editados via:
+    - Página: /definicoes
+    - API: PUT /api/company-info
+
+================================================================================
+                         FIM DA DOCUMENTAÇÃO
+================================================================================
+
+Documento gerado em: Julho 2026
+Documento atualizado em: Julho 2026
+Versão do projeto: 0.2.0
+Framework: Next.js 16.2.12
+Última atualização do schema: Prisma 7.9.1
