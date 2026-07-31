@@ -72,7 +72,7 @@ export default function ServicosInternosPage() {
       const res = await fetch(url, {
         method: editId ? "PATCH" : "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: form.name, description: form.description, category: form.category, basePrice: form.basePrice ? Number(form.basePrice) : null, unit: form.unit, serviceType: "INTERNO" }),
+        body: JSON.stringify({ name: form.name, description: form.description, category: form.category, defaultPrice: form.basePrice ? Number(form.basePrice) : null, unit: form.unit, serviceType: "INTERNO" }),
       });
       if (!res.ok) throw new Error();
       toast.success(editId ? "Atualizado." : "Criado.");

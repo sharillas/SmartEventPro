@@ -230,7 +230,7 @@ function SidebarContent({
   onLogout: () => void;
 }) {
   const isActive = (href: string) =>
-    href === "/" ? pathname === "/" : pathname.startsWith(href);
+    href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(href + "/");
   const isGroupActive = (group: MenuGroup) =>
     group.children.some((item) => isActive(item.href));
   const isGroupExpanded = (label: string) => expandedGroups.includes(label);

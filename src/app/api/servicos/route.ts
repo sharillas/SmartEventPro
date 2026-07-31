@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
 
     const where: Record<string, unknown> = { active: true };
     if (search) where.name = { contains: search };
-    if (type) where.serviceType = type;
+    if (type) where.tipo = type;
 
     const [data, total] = await Promise.all([
       prisma.service.findMany({ where: where as never, skip, take, orderBy: { createdAt: "desc" } }),
@@ -36,18 +36,19 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const service = await prisma.service.create({
-      data: {
-        name: body.name,
-        description: body.description,
-        category: body.category,
-        defaultPrice: body.defaultPrice,
-        unit: body.unit,
-        serviceType: body.serviceType || "EXTERNO",
-      } as never,
-    });
+    console.log("POST servico body:", JSON.stringify(body));
+    const data: Record<string, unknown> = {
+      name: body.name,
+      category: body.category,
+      unit: body.unit,
+      tipo: body.serviceType || "EXTERNO",
+    };
+    if (body.description) data.description = body.description;
+    if (body.defaultPrice !== undefined && body.defaultPrice !== null) data.defaultPrice = Number(body.defaultPrice);
+    const service = await prisma.service.create({ data: data as never });
     return NextResponse.json(service, { status: 201 });
   } catch (error) {
+    console.error("POST servico error:", error);
     return NextResponse.json({ error: "Erro ao criar serviço" }, { status: 500 });
   }
 }
