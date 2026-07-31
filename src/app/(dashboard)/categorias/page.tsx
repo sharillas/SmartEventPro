@@ -101,10 +101,10 @@ export default function CategoriasPage() {
 
       <div className="flex flex-wrap items-end justify-center gap-2 p-3 bg-card border border-border rounded-lg">
         <div className="flex flex-col gap-0.5">
-          <span className="text-[10px] text-muted-foreground">Nome</span>
-          <input placeholder="Nome" value={filters.name} onChange={e => setFilter("name", e.target.value)} className="w-[180px] h-7 text-xs bg-background border border-border rounded px-2 text-foreground placeholder:text-muted-foreground/50 outline-none" />
+          <span className="text-xs text-muted-foreground">Nome</span>
+          <input placeholder="Nome" value={filters.name} onChange={e => setFilter("name", e.target.value)} className="w-[180px] h-8 text-sm bg-background border border-border rounded px-2 text-foreground placeholder:text-muted-foreground/50 outline-none" />
         </div>
-        {hasAnyFilter && <button onClick={clearFilters} className="h-7 px-3 text-xs text-muted-foreground hover:text-foreground border border-border rounded">Limpar</button>}
+        {hasAnyFilter && <button onClick={clearFilters} className="h-8 px-3 text-sm text-muted-foreground hover:text-foreground border border-border rounded">Limpar</button>}
       </div>
 
       <Card>

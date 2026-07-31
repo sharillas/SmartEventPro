@@ -104,16 +104,16 @@ export default function ColaboradoresLogisticaPage() {
 
       <div className="flex flex-wrap items-end justify-center gap-2 p-3 bg-card border border-border rounded-lg">
         <div className="flex flex-col gap-0.5">
-          <span className="text-[10px] text-muted-foreground">Nome</span>
-          <input placeholder="Nome" value={filters.name} onChange={e => setFilter("name", e.target.value)} className="w-[150px] h-7 text-xs bg-background border border-border rounded px-2 text-foreground placeholder:text-muted-foreground/50 outline-none focus:border-primary/50" />
+          <span className="text-xs text-muted-foreground">Nome</span>
+          <input placeholder="Nome" value={filters.name} onChange={e => setFilter("name", e.target.value)} className="w-[150px] h-8 text-sm bg-background border border-border rounded px-2 text-foreground placeholder:text-muted-foreground/50 outline-none focus:border-primary/50" />
         </div>
         <div className="flex flex-col gap-0.5">
-          <span className="text-[10px] text-muted-foreground">Cargo</span>
-          <input placeholder="Cargo" value={filters.position} onChange={e => setFilter("position", e.target.value)} className="w-[140px] h-7 text-xs bg-background border border-border rounded px-2 text-foreground placeholder:text-muted-foreground/50 outline-none focus:border-primary/50" />
+          <span className="text-xs text-muted-foreground">Cargo</span>
+          <input placeholder="Cargo" value={filters.position} onChange={e => setFilter("position", e.target.value)} className="w-[140px] h-8 text-sm bg-background border border-border rounded px-2 text-foreground placeholder:text-muted-foreground/50 outline-none focus:border-primary/50" />
         </div>
         <div className="flex flex-col gap-0.5">
-          <span className="text-[10px] text-muted-foreground">Estado</span>
-          <select value={filters.status} onChange={e => setFilter("status", e.target.value)} className="w-[120px] h-7 text-xs bg-background border border-border rounded px-2 text-foreground outline-none focus:border-primary/50">
+          <span className="text-xs text-muted-foreground">Estado</span>
+          <select value={filters.status} onChange={e => setFilter("status", e.target.value)} className="w-[120px] h-8 text-sm bg-background border border-border rounded px-2 text-foreground outline-none focus:border-primary/50">
             <option value="">Todos</option>
             {Object.entries(statusLabel).map(([value, label]) => (
               <option key={value} value={value}>{label}</option>
@@ -121,7 +121,7 @@ export default function ColaboradoresLogisticaPage() {
           </select>
         </div>
         {hasAnyFilter && (
-          <button onClick={clearFilters} className="h-7 px-3 text-xs text-muted-foreground hover:text-foreground border border-border rounded hover:bg-accent/50 transition-colors mb-0.5">
+          <button onClick={clearFilters} className="h-8 px-3 text-sm text-muted-foreground hover:text-foreground border border-border rounded hover:bg-accent/50 transition-colors mb-0.5">
             Limpar
           </button>
         )}

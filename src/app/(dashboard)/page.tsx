@@ -162,7 +162,7 @@ export default function DashboardPage() {
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle>Agenda Semanal</CardTitle>
+            <CardTitle className="text-2xl font-bold tracking-tight">Agenda Semanal</CardTitle>
             <div className="flex items-center gap-2">
               <span className="text-xs text-muted-foreground">
                 {weekDays[0]?.date.toLocaleDateString("pt-PT", { day: "numeric", month: "short" })} –{" "}
@@ -211,7 +211,7 @@ export default function DashboardPage() {
                     {dayEvents.map((event) => (
                       <div
                         key={event.id}
-                        className={`text-[10px] leading-tight px-1 py-0.5 rounded border cursor-pointer truncate ${
+                        className={`text-xs leading-tight px-1.5 py-0.5 rounded border cursor-pointer truncate ${
                           statusBadge[event.status] || "border-gray-500 text-gray-400"
                         }`}
                         onMouseEnter={(e) => {

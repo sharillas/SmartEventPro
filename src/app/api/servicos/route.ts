@@ -13,11 +13,11 @@ export async function GET(request: NextRequest) {
       limit: request.nextUrl.searchParams.get("limit"),
     });
     const search = request.nextUrl.searchParams.get("search");
+    const type = request.nextUrl.searchParams.get("type");
 
     const where: Record<string, unknown> = { active: true };
-    if (search) {
-      where.name = { contains: search };
-    }
+    if (search) where.name = { contains: search };
+    if (type) where.serviceType = type;
 
     const [data, total] = await Promise.all([
       prisma.service.findMany({ where, skip, take, orderBy: { createdAt: "desc" } }),
@@ -43,7 +43,8 @@ export async function POST(request: NextRequest) {
         category: body.category,
         defaultPrice: body.defaultPrice,
         unit: body.unit,
-      },
+        serviceType: body.serviceType || "EXTERNO",
+      } as never,
     });
     return NextResponse.json(service, { status: 201 });
   } catch (error) {

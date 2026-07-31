@@ -210,19 +210,19 @@ export default function ReparacoesPage() {
       {/* Filter bar */}
       <div className="flex flex-wrap items-end justify-center gap-2 p-3 bg-card border border-border rounded-lg">
         <div className="flex flex-col gap-0.5">
-          <span className="text-[10px] text-muted-foreground">N.º Guia</span>
-          <input placeholder="N.º" value={filters.number} onChange={e => setFilter("number", e.target.value)} className="w-[110px] h-7 text-xs bg-background border border-border rounded px-2 text-foreground placeholder:text-muted-foreground/50 outline-none focus:border-primary/50" />
+          <span className="text-xs text-muted-foreground">N.º Guia</span>
+          <input placeholder="N.º" value={filters.number} onChange={e => setFilter("number", e.target.value)} className="w-[110px] h-8 text-sm bg-background border border-border rounded px-2 text-foreground placeholder:text-muted-foreground/50 outline-none focus:border-primary/50" />
         </div>
         <div className="flex flex-col gap-0.5">
-          <span className="text-[10px] text-muted-foreground">Descrição</span>
-          <input placeholder="Descrição" value={filters.description} onChange={e => setFilter("description", e.target.value)} className="w-[170px] h-7 text-xs bg-background border border-border rounded px-2 text-foreground placeholder:text-muted-foreground/50 outline-none focus:border-primary/50" />
+          <span className="text-xs text-muted-foreground">Descrição</span>
+          <input placeholder="Descrição" value={filters.description} onChange={e => setFilter("description", e.target.value)} className="w-[170px] h-8 text-sm bg-background border border-border rounded px-2 text-foreground placeholder:text-muted-foreground/50 outline-none focus:border-primary/50" />
         </div>
         <div className="flex flex-col gap-0.5">
-          <span className="text-[10px] text-muted-foreground">Estado</span>
-          <input placeholder="Estado" value={filters.status} onChange={e => setFilter("status", e.target.value)} className="w-[110px] h-7 text-xs bg-background border border-border rounded px-2 text-foreground placeholder:text-muted-foreground/50 outline-none focus:border-primary/50" />
+          <span className="text-xs text-muted-foreground">Estado</span>
+          <input placeholder="Estado" value={filters.status} onChange={e => setFilter("status", e.target.value)} className="w-[110px] h-8 text-sm bg-background border border-border rounded px-2 text-foreground placeholder:text-muted-foreground/50 outline-none focus:border-primary/50" />
         </div>
         {hasAnyFilter && (
-          <button onClick={clearFilters} className="h-7 px-3 text-xs text-muted-foreground hover:text-foreground border border-border rounded hover:bg-accent/50 transition-colors mb-0.5">
+          <button onClick={clearFilters} className="h-8 px-3 text-sm text-muted-foreground hover:text-foreground border border-border rounded hover:bg-accent/50 transition-colors mb-0.5">
             Limpar
           </button>
         )}

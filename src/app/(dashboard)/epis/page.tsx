@@ -345,12 +345,12 @@ export default function EpisPage() {
 
       <div className="flex flex-wrap items-end justify-center gap-2 p-3 bg-card border border-border rounded-lg">
         <div className="flex flex-col gap-0.5">
-          <span className="text-[10px] text-muted-foreground">Colaborador</span>
-          <input placeholder="Colaborador" value={filters.employee} onChange={e => setFilter("employee", e.target.value)} className="w-[160px] h-7 text-xs bg-background border border-border rounded px-2 text-foreground placeholder:text-muted-foreground/50 outline-none focus:border-primary/50" />
+          <span className="text-xs text-muted-foreground">Colaborador</span>
+          <input placeholder="Colaborador" value={filters.employee} onChange={e => setFilter("employee", e.target.value)} className="w-[160px] h-8 text-sm bg-background border border-border rounded px-2 text-foreground placeholder:text-muted-foreground/50 outline-none focus:border-primary/50" />
         </div>
         <div className="flex flex-col gap-0.5">
-          <span className="text-[10px] text-muted-foreground">Tipo</span>
-          <select value={filters.epiType} onChange={e => setFilter("epiType", e.target.value)} className="w-[130px] h-7 text-xs bg-background border border-border rounded px-2 text-foreground outline-none focus:border-primary/50">
+          <span className="text-xs text-muted-foreground">Tipo</span>
+          <select value={filters.epiType} onChange={e => setFilter("epiType", e.target.value)} className="w-[130px] h-8 text-sm bg-background border border-border rounded px-2 text-foreground outline-none focus:border-primary/50">
             <option value="">Todos</option>
             {Object.entries(epiTypeLabel).map(([value, label]) => (
               <option key={value} value={value}>{label}</option>
@@ -358,11 +358,11 @@ export default function EpisPage() {
           </select>
         </div>
         <div className="flex flex-col gap-0.5">
-          <span className="text-[10px] text-muted-foreground">Descrição</span>
-          <input placeholder="Descrição" value={filters.description} onChange={e => setFilter("description", e.target.value)} className="w-[160px] h-7 text-xs bg-background border border-border rounded px-2 text-foreground placeholder:text-muted-foreground/50 outline-none focus:border-primary/50" />
+          <span className="text-xs text-muted-foreground">Descrição</span>
+          <input placeholder="Descrição" value={filters.description} onChange={e => setFilter("description", e.target.value)} className="w-[160px] h-8 text-sm bg-background border border-border rounded px-2 text-foreground placeholder:text-muted-foreground/50 outline-none focus:border-primary/50" />
         </div>
         {hasAnyFilter && (
-          <button onClick={clearFilters} className="h-7 px-3 text-xs text-muted-foreground hover:text-foreground border border-border rounded hover:bg-accent/50 transition-colors mb-0.5">
+          <button onClick={clearFilters} className="h-8 px-3 text-sm text-muted-foreground hover:text-foreground border border-border rounded hover:bg-accent/50 transition-colors mb-0.5">
             Limpar
           </button>
         )}

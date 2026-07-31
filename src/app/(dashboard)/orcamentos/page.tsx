@@ -111,29 +111,29 @@ export default function OrcamentosPage() {
       {/* Filter bar */}
       <div className="flex flex-wrap items-end justify-center gap-2 p-3 bg-card border border-border rounded-lg">
         <div className="flex flex-col gap-0.5">
-          <span className="text-[10px] text-muted-foreground">Nº Orçamento</span>
-          <input placeholder="PR_..." value={filters.project} onChange={e => setFilter("project", e.target.value)} className="w-[130px] h-7 text-xs bg-background border border-border rounded px-2 text-foreground placeholder:text-muted-foreground/50 outline-none focus:border-primary/50" />
+          <span className="text-xs text-muted-foreground">Nº Orçamento</span>
+          <input placeholder="PR_..." value={filters.project} onChange={e => setFilter("project", e.target.value)} className="w-[130px] h-8 text-sm bg-background border border-border rounded px-2 text-foreground placeholder:text-muted-foreground/50 outline-none focus:border-primary/50" />
         </div>
         <div className="flex flex-col gap-0.5">
-          <span className="text-[10px] text-muted-foreground">Cliente</span>
-          <input placeholder="Cliente" value={filters.client} onChange={e => setFilter("client", e.target.value)} className="w-[150px] h-7 text-xs bg-background border border-border rounded px-2 text-foreground placeholder:text-muted-foreground/50 outline-none focus:border-primary/50" />
+          <span className="text-xs text-muted-foreground">Cliente</span>
+          <input placeholder="Cliente" value={filters.client} onChange={e => setFilter("client", e.target.value)} className="w-[150px] h-8 text-sm bg-background border border-border rounded px-2 text-foreground placeholder:text-muted-foreground/50 outline-none focus:border-primary/50" />
         </div>
         <div className="flex flex-col gap-0.5">
-          <span className="text-[10px] text-muted-foreground">Local</span>
-          <input placeholder="Local" value={filters.location} onChange={e => setFilter("location", e.target.value)} className="w-[170px] h-7 text-xs bg-background border border-border rounded px-2 text-foreground placeholder:text-muted-foreground/50 outline-none focus:border-primary/50" />
+          <span className="text-xs text-muted-foreground">Local</span>
+          <input placeholder="Local" value={filters.location} onChange={e => setFilter("location", e.target.value)} className="w-[170px] h-8 text-sm bg-background border border-border rounded px-2 text-foreground placeholder:text-muted-foreground/50 outline-none focus:border-primary/50" />
         </div>
         <div className="flex flex-col gap-0.5">
-          <span className="text-[10px] text-muted-foreground">Início</span>
-          <input type="date" value={filters.dateStart} onChange={e => setFilter("dateStart", e.target.value)} className="w-[130px] h-7 text-xs bg-background border border-border rounded px-2 text-foreground outline-none focus:border-primary/50" />
+          <span className="text-xs text-muted-foreground">Início</span>
+          <input type="date" value={filters.dateStart} onChange={e => setFilter("dateStart", e.target.value)} className="w-[130px] h-8 text-sm bg-background border border-border rounded px-2 text-foreground outline-none focus:border-primary/50" />
         </div>
         <div className="flex flex-col gap-0.5">
-          <span className="text-[10px] text-muted-foreground">Fim</span>
-          <input type="date" value={filters.dateEnd} onChange={e => setFilter("dateEnd", e.target.value)} className="w-[130px] h-7 text-xs bg-background border border-border rounded px-2 text-foreground outline-none focus:border-primary/50" />
+          <span className="text-xs text-muted-foreground">Fim</span>
+          <input type="date" value={filters.dateEnd} onChange={e => setFilter("dateEnd", e.target.value)} className="w-[130px] h-8 text-sm bg-background border border-border rounded px-2 text-foreground outline-none focus:border-primary/50" />
         </div>
         <div className="flex flex-col gap-0.5">
-          <span className="text-[10px] text-muted-foreground">Estado</span>
+          <span className="text-xs text-muted-foreground">Estado</span>
           <Select value={filters.status} onValueChange={(v) => setFilter("status", !v || v === "all" ? "" : v)}>
-            <SelectTrigger className="w-[130px] h-7 text-xs">
+            <SelectTrigger className="w-[130px] h-8 text-sm">
               <SelectValue placeholder="Todos" />
             </SelectTrigger>
             <SelectContent>
@@ -146,7 +146,7 @@ export default function OrcamentosPage() {
           </Select>
         </div>
         {hasAnyFilter && (
-          <button onClick={clearFilters} className="h-7 px-3 text-xs text-muted-foreground hover:text-foreground border border-border rounded hover:bg-accent/50 transition-colors mb-0.5">
+          <button onClick={clearFilters} className="h-8 px-3 text-sm text-muted-foreground hover:text-foreground border border-border rounded hover:bg-accent/50 transition-colors mb-0.5">
             Limpar
           </button>
         )}

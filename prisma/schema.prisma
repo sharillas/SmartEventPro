@@ -420,8 +420,9 @@ model Vehicle {
   insuranceExpiry DateTime?
   inspectionExpiry DateTime?
   notes           String?
-  active          Boolean  @default(true)
-  createdAt       DateTime @default(now())
+  active       Boolean  @default(true)
+  serviceType  String   @default("EXTERNO") // INTERNO, EXTERNO
+  createdAt    DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
   transportGuides TransportGuide[]

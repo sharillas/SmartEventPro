@@ -36,7 +36,7 @@ function isPublicPath(pathname: string) {
 
 const ROLE_API_MAP: Record<string, string[]> = {
   LOGISTICA: ["/api/equipamentos", "/api/reparacoes", "/api/transportes", "/api/veiculos", "/api/notas-encomenda", "/api/stock/movimentos", "/api/categorias"],
-  COMERCIAL: ["/api/clientes", "/api/orcamentos", "/api/projetos", "/api/servicos"],
+  COMERCIAL: ["/api/clientes", "/api/orcamentos", "/api/projetos", "/api/servicos", "/api/notas-encomenda", "/api/faturas"],
   FINANCEIRO: ["/api/faturas", "/api/notas-encomenda"],
   RH: ["/api/colaboradores", "/api/departamentos", "/api/funcoes", "/api/epis", "/api/certificacoes", "/api/contratos"],
   TECNICO: ["/api/timesheets", "/api/absences", "/api/colaboradores", "/api/projetos"],
@@ -54,12 +54,13 @@ function canAccessApi(role: string, pathname: string) {
 function canAccessPage(role: string, pathname: string) {
   if (pathname === "/") return true;
   if (role === "ADMIN") return true;
-  if (role === "TECNICO") return pathname === "/" || pathname.startsWith("/api/");
+  if (role === "TECNICO") return pathname.startsWith("/api/");
   const group = Object.entries(ROLE_API_MAP).find(([r]) => r === role);
   if (!group) return false;
   return group[1].some((prefix) => {
     const pagePath = prefix.replace("/api/", "/");
-    return pathname === pagePath || pathname.startsWith(pagePath + "/") || pathname.startsWith(prefix);
+    const segment = "/" + pagePath.split("/").pop();
+    return pathname.startsWith(prefix) || pathname === pagePath || pathname.startsWith(pagePath + "/") || pathname.startsWith(pagePath + "-") || pathname.endsWith(segment) || pathname.includes(segment + "/");
   });
 }
 

@@ -61,9 +61,10 @@ const menuGroups: MenuGroup[] = [
     requiredRole: "COMERCIAL",
     children: [
       { label: "Orçamentos", href: "/orcamentos", icon: FileText },
-      { label: "Eventos", href: "/projetos", icon: Calendar },
-      { label: "Clientes / Entidades", href: "/clientes", icon: Building2 },
-      { label: "Serviços", href: "/servicos", icon: Briefcase },
+      { label: "Clientes / Fornecedores", href: "/clientes", icon: Building2 },
+      { label: "Serviços Externos", href: "/servicos", icon: Briefcase },
+      { label: "Serviços Internos", href: "/servicos-internos", icon: Briefcase },
+      { label: "Notas de Encomenda", href: "/notas-encomenda", icon: FileText },
       { label: "Faturação", href: "/faturas", icon: Receipt },
     ],
   },
@@ -319,6 +320,7 @@ function SidebarContent({
       <Separator className="bg-sidebar-border" />
 
       {/* Definições */}
+      {isAdmin && (
       <div className="px-3 py-2">
         <Link
           href="/definicoes"
@@ -334,6 +336,7 @@ function SidebarContent({
           Definições / Admin
         </Link>
       </div>
+      )}
 
       <Separator className="bg-sidebar-border" />
       <div className="p-4 space-y-3">
