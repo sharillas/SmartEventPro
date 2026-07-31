@@ -94,10 +94,11 @@ export default function ServicosInternosPage() {
   const hasAnyFilter = Object.values(filters).some(v => v !== "");
 
   const { matched, rest } = useMemo(() => {
+    const arr = Array.isArray(services) ? services : [];
     const lf = { name: filters.name.toLowerCase(), category: filters.category.toLowerCase() };
-    if (!hasAnyFilter) return { matched: services, rest: [] };
+    if (!hasAnyFilter) return { matched: arr, rest: [] };
     const m: Service[] = []; const r: Service[] = [];
-    for (const s of services) {
+    for (const s of arr) {
       let ok = true;
       if (lf.name && !(s.name || "").toLowerCase().includes(lf.name)) ok = false;
       if (lf.category && !(categoryLabel[s.category] || s.category || "").toLowerCase().includes(lf.category)) ok = false;

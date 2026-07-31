@@ -20,8 +20,8 @@ export async function GET(request: NextRequest) {
     if (type) where.serviceType = type;
 
     const [data, total] = await Promise.all([
-      prisma.service.findMany({ where, skip, take, orderBy: { createdAt: "desc" } }),
-      prisma.service.count({ where }),
+      prisma.service.findMany({ where: where as never, skip, take, orderBy: { createdAt: "desc" } }),
+      prisma.service.count({ where: where as never }),
     ]);
 
     return NextResponse.json(paginatedResponse(data, total, page, limit));
